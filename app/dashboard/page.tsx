@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
+import Navbar from '@/app/components/Navbar'
 
 export default function Dashboard() {
   const { isSignedIn, isLoaded } = useAuth()
@@ -10,13 +11,20 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<any[]>([])
   const [language, setLanguage] = useState('Auto-detect')
+  const [stats, setStats] = useState<{ totalReviews: number; bugsFound: number } | null>(null)
 
   if (isLoaded && !isSignedIn) {
     router.push('/')
     return null
   }
 
-  const languages = ['Auto-detect','Python','JavaScript','TypeScript','Java','C++','Go','Rust']
+  useEffect(() => {
+    if (!isSignedIn) return
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(data => setStats(data))
+      .catch(console.error)
+  }, [isSignedIn])
 
   const detectLanguage = (code: string) => {
     if (/def |import |print\(/.test(code)) return 'Python'
@@ -43,6 +51,7 @@ export default function Dashboard() {
       })
       const data = await res.json()
       setResults(data.issues || [])
+      fetch('/api/stats').then(r => r.json()).then(setStats)
     } catch (e) {
       console.error(e)
     }
@@ -58,27 +67,35 @@ export default function Dashboard() {
   return (
     <div style={{ background: '#0a0a0a', minHeight: '100vh', color: '#fff', fontFamily: "'Syne', sans-serif" }}>
 
-      {/* nav */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.5px', cursor: 'pointer' }} onClick={() => router.push('/')}>
-          code<span style={{ color: '#4ade80' }}>sense</span>
-        </div>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>
-          dashboard
-        </div>
-      </nav>
+      <Navbar />
 
-      {/* main */}
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 24px' }}>
 
         {/* header */}
         <div style={{ marginBottom: '32px' }}>
           <h1 style={{ fontSize: '32px', fontWeight: 800, letterSpacing: '-1px', marginBottom: '8px' }}>
-            Review your code
+            review your code
           </h1>
           <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', fontFamily: "'DM Mono', monospace" }}>
-            Paste any code below and get instant AI feedback
+            paste any code below and get instant AI feedback
           </p>
+        </div>
+
+        {/* stats bar */}
+        <div style={{ display: 'flex', gap: '1px', marginBottom: '40px', borderRadius: '12px', overflow: 'hidden', border: '0.5px solid rgba(255,255,255,0.08)' }}>
+          {[
+            { label: 'total reviews', value: stats ? stats.totalReviews : '—' },
+            { label: 'bugs caught', value: stats ? stats.bugsFound : '—' },
+          ].map((s, i) => (
+            <div key={s.label} style={{ flex: 1, padding: '16px 24px', background: '#111', borderLeft: i > 0 ? '0.5px solid rgba(255,255,255,0.06)' : 'none' }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, letterSpacing: '-0.5px', color: '#4ade80', marginBottom: '4px' }}>
+                {s.value}
+              </div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Mono', monospace" }}>
+                {s.label}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* editor */}
@@ -104,7 +121,7 @@ export default function Dashboard() {
         </div>
 
         {/* actions */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '40px' }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '40px', alignItems: 'center' }}>
           <button
             onClick={reviewCode}
             disabled={loading || !code.trim()}
@@ -126,6 +143,15 @@ export default function Dashboard() {
           >
             clear
           </button>
+          <a href="/history" style={{ marginLeft: 'auto', textDecoration: 'none' }}>
+            <button style={{
+              background: 'transparent', color: 'rgba(255,255,255,0.4)', fontSize: '13px',
+              padding: '12px 20px', borderRadius: '8px', border: '0.5px solid rgba(255,255,255,0.1)',
+              cursor: 'pointer', fontFamily: "'DM Mono', monospace",
+            }}>
+              view history →
+            </button>
+          </a>
         </div>
 
         {/* results */}
@@ -154,7 +180,7 @@ export default function Dashboard() {
               {results.map((issue, i) => {
                 const c = severityColor(issue.severity)
                 return (
-                  <div key={i} style={{ background: '#111', border: `0.5px solid rgba(255,255,255,0.08)`, borderRadius: '12px', padding: '20px 24px', borderLeft: `3px solid ${c.color}` }}>
+                  <div key={i} style={{ background: '#111', borderRadius: '12px', padding: '20px 24px', borderLeft: `3px solid ${c.color}` }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                       <span style={{ fontSize: '10px', padding: '3px 10px', borderRadius: '20px', background: c.bg, color: c.color, fontFamily: "'DM Mono', monospace" }}>{issue.severity}</span>
                       <span style={{ fontSize: '15px', fontWeight: 700 }}>{issue.title}</span>
