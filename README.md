@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CodeSense — AI Code Review Platform
+
+CodeSense is a full-stack AI-powered code review platform that analyzes source code and provides structured feedback to help developers identify issues and improve their code.
+
+## Features
+
+* 🤖 AI-powered code reviews using **Groq API + LLaMA 3.3 70B**
+* 🔴 **Critical** — serious issues and potential bugs
+* 🟠 **Warning** — potential risks and code-quality problems
+* 🔵 **Suggestion** — recommended improvements
+* 🧠 Automatic programming-language detection
+* 📝 Integrated code editor
+* 🔐 Authentication with **Clerk**
+* 💾 Persistent review history with **Supabase PostgreSQL**
+* 🔒 Row Level Security for user data
+* 📱 Responsive UI
+
+## Tech Stack
+
+| Category       | Technologies                         |
+| -------------- | ------------------------------------ |
+| Frontend       | Next.js 14, TypeScript, Tailwind CSS |
+| AI             | Groq API, LLaMA 3.3 70B              |
+| Database       | Supabase, PostgreSQL                 |
+| Authentication | Clerk                                |
+
+## How It Works
+
+```text
+Write / Paste Code
+       ↓
+Language Detection
+       ↓
+AI Analysis
+       ↓
+LLaMA 3.3 70B
+       ↓
+Structured Review
+       ↓
+Critical / Warning / Suggestion
+       ↓
+Review History
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+* Node.js
+* npm
+* Supabase project
+* Clerk application
+* Groq API key
+
+### Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/sanidhya091/CodeSense.git
+cd CodeSense
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a `.env.local` file and add the required credentials for:
+
+* Groq
+* Supabase
+* Clerk
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Goal
 
-## Learn More
+CodeSense was built to explore the integration of large language models into developer tooling.
 
-To learn more about Next.js, take a look at the following resources:
+Instead of treating an LLM as a standalone chatbot, CodeSense turns AI-generated analysis into a structured code-review workflow with severity-based feedback, authentication, and persistent review history.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Sanidhya Singh**
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* GitHub: https://github.com/sanidhya091
+* LinkedIn: https://www.linkedin.com/in/sanidhya-singh-2aa6b7273/
